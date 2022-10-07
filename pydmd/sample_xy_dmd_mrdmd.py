@@ -4,8 +4,7 @@ import scipy
 
 from pydmd import DMDBase
 from pydmd import MrDMD
-from pydmd.dmdoperator import DMDOperator
-from pydmd.dmdbase import DMDTimeDict
+from functools import partial
 from pydmd.utils import compute_tlsq
 from scipy.linalg import block_diag
 from .dmd_modes_tuner import ModesSelectors, select_modes
@@ -202,7 +201,10 @@ class SampleXY_MrDMD(MrDMD):
         """
         leaves = self.dmd_tree.index_leaves(level) if node is None else [node]
         return np.concatenate([self.dmd_tree[level, leaf].eigs for leaf in leaves if self.dmd_tree[level,leaf] is not None])
-    
+
+    def slow_modes(dmd, rho):
+        return np.abs(np.log(dmd.eigs)) < rho * 2 * np.pi
+
     def fit(self, X, Y, Tm, SAMPLE_FACTOR: int = 10,decimate: bool = True):
         """
         Compute the Dynamic Modes Decomposition to the input data.
@@ -274,6 +276,8 @@ class SampleXY_MrDMD(MrDMD):
 
                     current_dmd.rho = rho
                     current_dmd.sub = sub
+                    slow_modes_selector = partial(slow_modes, rho=rho)
+
                     select_modes(current_dmd,slow_modes_selector)
                    
                 else:
