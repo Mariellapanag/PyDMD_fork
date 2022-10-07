@@ -487,6 +487,9 @@ Expected one item per level, got {} out of {} levels.""".format(
                 current_dmd.fit(x)
 
                 rho = old_div(float(self.max_cycles), x.shape[1])
+
+                current_dmd.rho = rho
+
                 slow_modes_selector = partial(slow_modes, rho=rho)
 
                 select_modes(current_dmd, slow_modes_selector)
