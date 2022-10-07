@@ -3,10 +3,11 @@ import scipy
 
 from pydmd import DMDBase
 from pydmd import MrDMD
-from pydmd.dmdoperator import DMDOperator
+from functools import partial
 from pydmd.dmdbase import DMDTimeDict
 from pydmd.utils import compute_tlsq
-from pydmd.dmd_modes_tuner import select_modes, slow_modes
+from .dmd_modes_tuner import ModesSelectors, select_modes
+from .mrdmd import slow_modes
 from scipy import signal
 from past.utils import old_div
 
@@ -138,7 +139,9 @@ class Sample_MrDMD(MrDMD):
                 
                 current_dmd.rho = rho
                 current_dmd.sub = sub
-                select_modes(current_dmd,slow_modes)
+                slow_modes_selector = partial(slow_modes, rho=rho)
+
+                select_modes(current_dmd,slow_modes_selector)
                 
             newX = np.hstack([
                 self.dmd_tree[level, leaf].reconstructed_data

@@ -1,4 +1,4 @@
-The MIT License (MIT)
+TThe MIT License (MIT)
 
 Copyright (c) 2017-2019 PyDMD contributors
 

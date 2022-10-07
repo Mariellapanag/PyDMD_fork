@@ -8,7 +8,7 @@ from pydmd.dmdoperator import DMDOperator
 from pydmd.dmdbase import DMDTimeDict
 from pydmd.utils import compute_tlsq
 from scipy.linalg import block_diag
-from pydmd.dmd_modes_tuner import select_modes, slow_modes
+from .dmd_modes_tuner import ModesSelectors, select_modes
 from scipy import signal
 from past.utils import old_div
 
@@ -274,7 +274,7 @@ class SampleXY_MrDMD(MrDMD):
 
                     current_dmd.rho = rho
                     current_dmd.sub = sub
-                    select_modes(current_dmd,slow_modes)
+                    select_modes(current_dmd,slow_modes_selector)
                    
                 else:
                     self.dmd_tree[level,leaf] = None
