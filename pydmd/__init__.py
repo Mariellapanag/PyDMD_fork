@@ -19,3 +19,5 @@ from .spdmd import SpDMD
 from .paramdmd import ParametricDMD
 from .dmd_modes_tuner import ModesTuner
 from .subspacedmd import SubspaceDMD
+from .sample_xy_dmd_mrdmd import SampleXY_DMD, SampleXY_MrDMD
+from .sample_dmd_mrdmd import Sample_DMD, Sample_MrDMD
