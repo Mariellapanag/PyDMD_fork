@@ -97,8 +97,6 @@ class Sample_MrDMD(MrDMD):
     ):
         super().__init__(dmd=dmd,max_cycles=max_cycles,max_level=max_level)
 
-    def slow_modes(dmd, rho):
-        return np.abs(np.log(dmd.eigs)) < rho * 2 * np.pi
 
     def fit(self, X, SAMPLE_FACTOR, decimate = True):
         """
@@ -121,6 +119,9 @@ class Sample_MrDMD(MrDMD):
             print('Too many levels... '
                   'Redefining `max_level` to {}'.format(self.max_level))
 
+        def slow_modes(dmd, rho):
+            return np.abs(np.log(dmd.eigs)) < rho * 2 * np.pi
+
         X = self._snapshots.copy()
         for level in self.dmd_tree.levels:
 
@@ -140,7 +141,7 @@ class Sample_MrDMD(MrDMD):
                 
                 current_dmd.rho = rho
                 current_dmd.sub = sub
-                slow_modes_selector = partial(current_dmd.slow_modes, rho=rho)
+                slow_modes_selector = partial(slow_modes, rho=rho)
 
                 select_modes(current_dmd,slow_modes_selector)
                 

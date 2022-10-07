@@ -202,9 +202,6 @@ class SampleXY_MrDMD(MrDMD):
         leaves = self.dmd_tree.index_leaves(level) if node is None else [node]
         return np.concatenate([self.dmd_tree[level, leaf].eigs for leaf in leaves if self.dmd_tree[level,leaf] is not None])
 
-    def slow_modes(dmd, rho):
-        return np.abs(np.log(dmd.eigs)) < rho * 2 * np.pi
-
     def fit(self, X, Y, Tm, SAMPLE_FACTOR: int = 10,decimate: bool = True):
         """
         Compute the Dynamic Modes Decomposition to the input data.
@@ -233,6 +230,10 @@ class SampleXY_MrDMD(MrDMD):
                 "Too many levels... "
                 "Redefining `max_level` to {}".format(self.max_level)
             )
+
+        def slow_modes(dmd, rho):
+            return np.abs(np.log(dmd.eigs)) < rho * 2 * np.pi
+
         X = self._snapshotsX.copy()
         Y = self._snapshotsY.copy()
         
@@ -276,7 +277,7 @@ class SampleXY_MrDMD(MrDMD):
 
                     current_dmd.rho = rho
                     current_dmd.sub = sub
-                    slow_modes_selector = partial(current_dmd.slow_modes, rho=rho)
+                    slow_modes_selector = partial(slow_modes, rho=rho)
 
                     select_modes(current_dmd,slow_modes_selector)
                    
