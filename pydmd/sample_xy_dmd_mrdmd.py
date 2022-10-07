@@ -276,7 +276,7 @@ class SampleXY_MrDMD(MrDMD):
 
                     current_dmd.rho = rho
                     current_dmd.sub = sub
-                    slow_modes_selector = partial(slow_modes, rho=rho)
+                    slow_modes_selector = partial(current_dmd.slow_modes, rho=rho)
 
                     select_modes(current_dmd,slow_modes_selector)
                    
