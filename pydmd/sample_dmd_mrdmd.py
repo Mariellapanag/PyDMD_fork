@@ -7,7 +7,6 @@ from functools import partial
 from pydmd.dmdbase import DMDTimeDict
 from pydmd.utils import compute_tlsq
 from .dmd_modes_tuner import ModesSelectors, select_modes
-from .mrdmd import slow_modes
 from scipy import signal
 from past.utils import old_div
 
@@ -97,8 +96,10 @@ class Sample_MrDMD(MrDMD):
                  max_cycles=1
     ):
         super().__init__(dmd=dmd,max_cycles=max_cycles,max_level=max_level)
-        
- 
+
+    def slow_modes(dmd, rho):
+        return np.abs(np.log(dmd.eigs)) < rho * 2 * np.pi
+
     def fit(self, X, SAMPLE_FACTOR, decimate = True):
         """
         Compute the Dynamic Modes Decomposition to the input data.
