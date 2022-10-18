@@ -29,7 +29,8 @@ class Sample_DMD(DMDBase):
             opt=opt, rescale_mode=rescale_mode, forward_backward=forward_backward,
             sorted_eigs=sorted_eigs)
 
-    def fit(self, X, sub, nstacks = 1, decimate=True, augmentation = True):
+
+    def fit(self, X, sub, decimate=True):
         """
         Compute the Dynamic Modes Decomposition to the input data.
         Option of subsampling and augmentation
@@ -51,22 +52,8 @@ class Sample_DMD(DMDBase):
         else:
             Z = Z[:,::sub]
 
-        if augmentation:
-            if (nstacks > 1):
-                cols = Z.shape[1]
-                Xaug_list = list()
-                for xstack in range(nstacks):
-                    Xaug_part = Z[:, xstack:cols - nstacks + xstack + 1]
-                    Xaug_list.append(Xaug_part)
-
-                Xaug = np.vstack(Xaug_list)
-                # obtaining X and Y where columns of Y are shifted just by dt compared to columns of X
-                # here we use the augmented Xaug data matrix
-                X = Xaug[:, :-1]
-                Y = Xaug[:, 1:]
-        else:
-            X = Z[:, :-1]
-            Y = Z[:, 1:]
+        X = Z[:, :-1]
+        Y = Z[:, 1:]
 
         X, Y = compute_tlsq(X, Y, self.tlsq_rank)
         self._svd_modes, _, _ = self.operator.compute_operator(X,Y)
