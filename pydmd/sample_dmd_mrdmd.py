@@ -48,8 +48,8 @@ class Sample_DMD(DMDBase):
         if decimate:
             if sub > 1:
                 Z = signal.decimate(Z,sub,ftype = 'fir',axis = 1)
-            else:
-                Z = Z[:,::sub]
+        else:
+            Z = Z[:,::sub]
 
         if augmentation:
             if (nstacks > 1):
