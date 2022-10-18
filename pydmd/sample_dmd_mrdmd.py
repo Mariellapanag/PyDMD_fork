@@ -28,43 +28,56 @@ class Sample_DMD(DMDBase):
         super().__init__(svd_rank=svd_rank, tlsq_rank=tlsq_rank, exact=exact,
             opt=opt, rescale_mode=rescale_mode, forward_backward=forward_backward,
             sorted_eigs=sorted_eigs)
-        
-    def fit(self, X, sub, decimate=True):
+
+    def fit(self, X, sub, nstacks = 1, decimate=True, augmentation = True):
         """
         Compute the Dynamic Modes Decomposition to the input data.
-        
+        Option of subsampling and augmentation
         :param X: the input snapshots
         :param sub: downsample rate
         :param decimate: downsample using scipy.signal.decimate default:True
         :type X: numpy.ndarray
-        :type sub: int
+        :type sub: int; if sub = 1 then the downsample is not performed
         :type decimate: bool
         """
 
         self._snapshots, self._snapshots_shape = self._col_major_2darray(X)
-        
+
         Z = self._snapshots.copy()
-        
+
         if decimate:
             if sub > 1:
                 Z = signal.decimate(Z,sub,ftype = 'fir',axis = 1)
+            else:
+                Z = Z[:,::sub]
+
+        if augmentation:
+            if (nstacks > 1):
+                cols = Z.shape[1]
+                Xaug_list = list()
+                for xstack in range(nstacks):
+                    Xaug_part = Z[:, xstack:cols - nstacks + xstack + 1]
+                    Xaug_list.append(Xaug_part)
+
+                Xaug = np.vstack(Xaug_list)
+                # obtaining X and Y where columns of Y are shifted just by dt compared to columns of X
+                # here we use the augmented Xaug data matrix
+                X = Xaug[:, :-1]
+                Y = Xaug[:, 1:]
         else:
-            Z = Z[:,::sub]
-        
-        X = Z[:, :-1]
-        Y = Z[:, 1:]
-        
+            X = Z[:, :-1]
+            Y = Z[:, 1:]
+
         X, Y = compute_tlsq(X, Y, self.tlsq_rank)
         self._svd_modes, _, _ = self.operator.compute_operator(X,Y)
-        
+
         n_samples = self._snapshots.shape[1]
         self._original_time = DMDTimeDict({'t0': 0, 'tend': n_samples - 1, 'dt': sub})
         self._dmd_time = DMDTimeDict({'t0': 0, 'tend': n_samples - 1, 'dt': 1})
-        
+
         self._b = self._compute_amplitudes()
 
         return self
-
 
 class Sample_MrDMD(MrDMD):
     """
